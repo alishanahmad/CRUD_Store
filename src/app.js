@@ -12,4 +12,5 @@ syncDB().then(() => console.log("db synced"));
 app.use(allRoute);
 app.listen(port, () => {
   console.log(`Server is running at port ${port}`);
+  
 });
