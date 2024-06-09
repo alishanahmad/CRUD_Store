@@ -1,29 +1,27 @@
-import sequelize from '../../db/config.js';
-import { DataTypes } from 'sequelize';
-import saleModel from '../sale/index.js';
-import productModel from '../product/index.js';
+import { DataTypes } from "sequelize";
+import sequelize from "../../db/config.js";
+import saleModel from "../sale/index.js";
+import productModel from "../product/index.js";
 
-const saleProductsModel = sequelize.define(
-  'SaleProducts',
-  {
-    productName: {
-        type: DataTypes.STRING,
-        allowNull:false
-    },
-    quantity: {
-        type: DataTypes.INTEGER
-    },
-    rate: {
-        type: DataTypes.DOUBLE
-    }
-  }
-);
+const productSaleModel = sequelize.define("SaleProducts", {
+  quantity: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  productId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  saleId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+});
 
-saleModel.hasMany(saleProductsModel);
-saleProductsModel.belongsTo(saleModel);
+saleModel.hasMany(productSaleModel, { foreignKey: "saleId" });
+productSaleModel.belongsTo(saleModel, { foreignKey: "saleId" });
 
-productModel.hasMany(saleProductsModel);
-saleProductsModel.belongsTo(productModel);
+productModel.hasMany(productSaleModel, { foreignKey: "productId" });
+productSaleModel.belongsTo(productModel, { foreignKey: "productId" });
 
-
-export default saleProductsModel;
+export default productSaleModel;

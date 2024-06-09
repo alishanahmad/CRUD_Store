@@ -1,11 +1,8 @@
-// import marksModel from "../model/marks/index.js";
 import productModel from "../model/product/index.js";
-// import saleModel from "../model/sale/sales.js";
-// import saleProductModel from "../model/sale/saleProduct.js"
-// import studentModel from "../model/student/index.js";
-// import teacherModel from "../model/teacher/index.js";
-// import userModel from "../model/user/index.js";
-// import tokenModel from "../model/auth/index.js";
+import saleModel from "../model/sale/index.js";
+import productSaleModel from "../model/productSale/index.js"
+import categoryModel from "../model/category/index.js";
+
 import sequelize from "./config.js";
 
 const syncDB=async()=>{

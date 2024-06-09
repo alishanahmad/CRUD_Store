@@ -4,14 +4,13 @@ const productController = {
   getAll: async (req, res) => {
     try {
       const products = await productModel.findAll();
-
       if (!products) {
-        console.log("Product doesn't exist");
+        return res.status(404).json({ message: "No products found" });
       }
-      res.json({ data: products });
+      res.status(200).json({ data: products });
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: "internal server error at getAll" });
+      console.error(error);
+      res.status(500).json({ message: "Internal server error at getAll" });
     }
   },
 
@@ -20,86 +19,75 @@ const productController = {
       const { id } = req.params;
       const product = await productModel.findByPk(id);
       if (!product) {
-        return res.status(404).json({ message: "no product with this name" });
+        return res.status(404).json({ message: "Product not found" });
       }
       res.status(200).json({ data: product });
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: "internal server error" });
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
     }
   },
 
   post: async (req, res) => {
     try {
-      const payload = req.body;
-      const product = new productModel();
-      product.name = payload.name;
-      product.price = payload.price;
-      product.stock = payload.stock;
+      if (!req.body.name || !req.body.price || req.body.stock === undefined) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
 
-      await product.save();
-
-      res.status(200).json({ message: "Product created", product });
+      const product = await productModel.create({
+        name: req.body.name,
+        price: req.body.price,
+        stock: req.body.stock,
+      });
+      // await product.save();
+      res.status(201).json({ message: "Product created", product });
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: "internal server error" });
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
     }
   },
+
   put: async (req, res) => {
     try {
-      const { id } = req.params;
-      const payload = req.body;
-      console.log("id is this in put ", id);
-      const product = await productModel.findByPk(id);
-      if (!id) {
-        res.status(404).json({
-          message: "not found",
-        });
+      const product = await productModel.findByPk(req.params.id);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
       }
-      // res.status(302).json({
-      //   message:"found",
-      // })
-      product.name = payload.name;
-      product.price = payload.price;
-      product.stock = payload.stock;
+
+      product.name = req.body.name;
+      product.price = req.body.price;
+      product.stock = req.body.stock;
 
       await product.save();
-      res.json({
-        message: "successfully updated.",
-        product,
-      });
 
-      // res.status(200).json({ message: "Product created", product });
+      res
+        .status(200)
+        .json({ message: "Product successfully updated", product });
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: "internal server error" });
+      console.error(error);
+      res.status(500).json({
+        message: "Internal server error",
+      });
     }
   },
+
   delete: async (req, res) => {
     try {
-      const { id } = req.params;
-      // const payload=req.body;
-      console.log(
-        "------------------------------------------------------------id is this in put ",
-        id
-      );
-      const product = await productModel.findByPk(id);
+      // const { id } = req.params;
+      const product = await productModel.findByPk(req.params.id);
       if (!product) {
-        res.status(404).json({
-          message: "not found",
-        });
+        return res.status(404).json({ message: "Product not found" });
       }
 
       await product.destroy();
-      res.json({
-        message: "product deleted successfully",
-        product,
-      });
+      res
+        .status(200)
+        .json({ message: "Product deleted successfully", product });
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: "internal server error" });
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
     }
   },
 };
-export default productController;
 
+export default productController;
