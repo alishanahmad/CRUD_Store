@@ -14,9 +14,6 @@ const categoryController = {
   getSingle: async (req, res) => {
     try {
       const category = await categoryModel.findOne({ where: req.params });
-      console.log(
-        "-----------------------------------error----------------------------"
-      );
       if (!category) {
         return res.status(404).json({ message: "No category with this name" });
       }
@@ -26,6 +23,14 @@ const categoryController = {
     }
   },
   post: async (req, res) => {
+    const schema = Joi.object({
+      name: Joi.string().min(3).max(30).required(),
+    });
+
+    const { error, value } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
     try {
       console.log(req.body, "payload");
       const category = await categoryModel.create({
@@ -39,6 +44,14 @@ const categoryController = {
     }
   },
   put: async (req, res) => {
+    const schema = Joi.object({
+      name: Joi.string().min(3).max(30).required(),
+    });
+
+    const { error, value } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
     try {
       const category = await categoryModel.findByPk(req.params.id);
       if (!category) {

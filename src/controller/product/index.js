@@ -1,8 +1,14 @@
 import productModel from "../../model/product/index.js";
-
+import categoryModel from "../../model/category/index.js";
+import { Op } from "sequelize";
+import Joi from "joi";
 const productController = {
   getAll: async (req, res) => {
+
     try {
+      
+      const  {search}  = req.query;
+
       const products = await productModel.findAll();
       if (!products) {
         return res.status(404).json({ message: "No products found" });
@@ -29,6 +35,17 @@ const productController = {
   },
 
   post: async (req, res) => {
+    const schema = Joi.object({
+      name: Joi.string().min(3).max(30).required(),
+      price: Joi.double().min(3).max(30).required(),
+      stock:Joi.double().min(0).max().required(),
+      categoryId:Joi.integer().min(0).max().required()
+    });
+
+    const { error, value } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
     try {
       if (!req.body.name || !req.body.price || req.body.stock === undefined) {
         return res.status(400).json({ message: "All fields are required" });
@@ -38,8 +55,8 @@ const productController = {
         name: req.body.name,
         price: req.body.price,
         stock: req.body.stock,
+        categoryId:req.body.categoryId
       });
-      // await product.save();
       res.status(201).json({ message: "Product created", product });
     } catch (error) {
       console.error(error);
@@ -48,6 +65,17 @@ const productController = {
   },
 
   put: async (req, res) => {
+    const schema = Joi.object({
+      name: Joi.string().min(3).max(30).required(),
+      price: Joi.double().min(3).max(30).required(),
+      stock:Joi.double().min(0).max().required(),
+      categoryId:Joi.integer().min(0).max().required()
+    });
+
+    const { error, value } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
     try {
       const product = await productModel.findByPk(req.params.id);
       if (!product) {
@@ -76,8 +104,7 @@ const productController = {
       const product = await productModel.findByPk(req.params.id);
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
-      }
-      else{
+      } else {
         await product.destroy();
       }
       res
